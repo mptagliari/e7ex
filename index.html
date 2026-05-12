@@ -180,6 +180,48 @@
   .paste-area .btn-proc { margin-top:.6rem; background:var(--laranja); color:#fff; padding:.6rem 1.25rem; border-radius:7px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:.85rem; font-weight:600; }
   .paste-area .btn-proc:hover { background:var(--laranja-c); }
 
+  .instrucoes-bm {
+    background: var(--sup2);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: .75rem 0 1rem;
+  }
+  .inst-titulo {
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--texto);
+    margin-bottom: .75rem;
+  }
+  .inst-passo {
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+    margin-bottom: .6rem;
+    font-size: .83rem;
+    color: var(--suave);
+    line-height: 1.6;
+  }
+  .inst-passo:last-child { margin-bottom: 0; }
+  .inst-num {
+    min-width: 22px; height: 22px;
+    background: var(--laranja);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .72rem; font-weight: 700; font-family: 'Syne', sans-serif;
+    margin-top: 2px;
+  }
+  kbd {
+    background: var(--sup);
+    border: 1px solid var(--borda);
+    border-bottom: 2px solid var(--borda);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: monospace;
+    font-size: .78rem;
+    color: var(--texto);
+  }
+
   @media(max-width:600px){
     .hero,.content{ padding-left:1.25rem; padding-right:1.25rem; }
     .hide-mob { display:none; }
@@ -207,10 +249,28 @@
       <div class="metodo-num">1</div>
       <h3>Arraste o botão para a barra de favoritos</h3>
     </div>
-    <p>Clique com o <strong>botão direito</strong> no botão abaixo e escolha <strong>"Adicionar aos favoritos"</strong>. Ou arraste para a barra de favoritos, que pode ser visualizada utilizando os atalhos <strong>Ctrl+Shift+B</strong> (Mac: <strong>⌘+Shift+B</strong>).</p>
+    <p>
+      O botão abaixo é um <strong>bookmarklet</strong> — um favorito especial que, ao ser clicado, 
+      executa uma tarefa no site que você estiver visitando. Neste caso, ele vai entrar na sua 
+      lista de clientes do Elo7 e salvar tudo automaticamente em uma planilha.<br><br>
+      Precisamos usá-lo porque o Elo7 não tem botão de exportar — então o bookmarklet 
+      faz esse trabalho por você, de forma segura, sem instalar nada no seu computador.
+    </p>
+
+    <div class="instrucoes-bm">
+      <p class="inst-titulo">📌 Como instalar em 2 passos:</p>
+      <div class="inst-passo">
+        <span class="inst-num">1</span>
+        <span>Mostre a barra de favoritos do Chrome: pressione <kbd>⌘ Cmd</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> no Mac, ou <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> no Windows. Uma barra vai aparecer no topo do navegador.</span>
+      </div>
+      <div class="inst-passo">
+        <span class="inst-num">2</span>
+        <span>Arraste o botão laranja abaixo até essa barra. Ele vai ficar salvo lá como um favorito normal.</span>
+      </div>
+    </div>
 
     <div class="bm-wrap">
-      <span class="bm-label">⬇ Botão direito → Adicionar aos favoritos</span>
+      <span class="bm-label">⬇ Arraste este botão para a barra de favoritos</span>
       <a class="bm-btn" id="bm-link" href="#">🧵 Salvar Clientes Elo7</a>
     </div>
 
