@@ -8,17 +8,17 @@
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
 
   :root {
-    --laranja: #FF5722;
-    --laranja-c: #FF7043;
-    --fundo: #0F0D0B;
-    --sup: #1A1713;
-    --sup2: #231F1A;
-    --borda: #2E2925;
-    --texto: #F0EBE3;
-    --suave: #8A7F74;
-    --verde: #4CAF7D;
-    --amarelo: #FFB300;
-    --azul: #42A5F5;
+    --laranja: #E8440A;
+    --laranja-c: #F05A22;
+    --fundo: #F7F4F1;
+    --sup: #FFFFFF;
+    --sup2: #F0ECE8;
+    --borda: #E0D9D3;
+    --texto: #1A1410;
+    --suave: #7A6E65;
+    --verde: #2E8B57;
+    --amarelo: #B8860B;
+    --azul: #1976D2;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,7 +29,7 @@
     border-bottom: 1px solid var(--borda);
     display: flex; align-items: center; gap: 0.75rem;
     position: sticky; top: 0;
-    background: rgba(15,13,11,0.94);
+    background: rgba(247,244,241,0.96);
     backdrop-filter: blur(12px); z-index: 100;
   }
   .logo { width:32px; height:32px; background: var(--laranja); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
@@ -207,16 +207,15 @@
       <div class="metodo-num">1</div>
       <h3>Arraste o botão para a barra de favoritos</h3>
     </div>
-    <p>Mostre a barra de favoritos do Chrome: <strong>Ctrl+Shift+B</strong> (Mac: <strong>⌘+Shift+B</strong>). Depois arraste o botão laranja abaixo para ela:</p>
+    <p>Clique com o <strong>botão direito</strong> no botão abaixo e escolha <strong>"Adicionar aos favoritos"</strong>. Ou arraste para a barra de favoritos se ela estiver visível.</p>
 
     <div class="bm-wrap">
-      <span class="bm-label">⬇ Arraste para a barra de favoritos</span>
+      <span class="bm-label">⬇ Botão direito → Adicionar aos favoritos</span>
       <a class="bm-btn" id="bm-link" href="#">🧵 Salvar Clientes Elo7</a>
-      <p class="bm-alt">Se não funcionar arrastar, clique no botão com o botão direito → "Adicionar aos favoritos"</p>
     </div>
 
     <div class="passos">
-      <div class="passo"><div class="passo-n">2</div><p>Entre no Elo7 com a conta da sua esposa e acesse <code>Clientes → Procurar</code> (<code>/manage/client/list</code>)</p></div>
+      <div class="passo"><div class="passo-n">2</div><p>Entre no Elo7 com a sua conta e acesse <code>Clientes → Procurar</code> (<code>/manage/client/list</code>)</p></div>
       <div class="passo"><div class="passo-n">3</div><p>Clique no favorito <strong>"Salvar Clientes Elo7"</strong> que você acabou de adicionar</p></div>
       <div class="passo"><div class="passo-n">4</div><p>Uma janelinha vai aparecer mostrando o progresso. Ele detecta e percorre <strong>todas as páginas</strong> automaticamente e decodifica os e-mails</p></div>
       <div class="passo"><div class="passo-n">5</div><p>Ao terminar, <strong>o CSV é baixado automaticamente</strong>. Abra no Excel ou Google Sheets — pronto!</p></div>
@@ -343,8 +342,8 @@ const bookmarkletCode = `
 
   // UI overlay
   const ov=document.createElement('div');
-  ov.style.cssText='position:fixed;top:20px;right:20px;z-index:99999;background:#1a1713;border:1px solid #FF5722;border-radius:12px;padding:1.25rem 1.5rem;font-family:sans-serif;color:#f0ebe3;min-width:260px;box-shadow:0 8px 32px rgba(0,0,0,.5)';
-  ov.innerHTML='<div style="font-weight:700;font-size:.95rem;margin-bottom:.5rem">🧵 Salvando clientes Elo7</div><div id="_e7prog">Iniciando...</div><div id="_e7bar" style="height:4px;background:#2e2925;border-radius:2px;margin-top:.75rem"><div id="_e7fill" style="height:4px;background:#FF5722;border-radius:2px;width:0;transition:width .3s"></div></div>';
+  ov.style.cssText='position:fixed;top:20px;right:20px;z-index:99999;background:#ffffff;border:1px solid #E8440A;border-radius:12px;padding:1.25rem 1.5rem;font-family:sans-serif;color:#1a1410;min-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.12)';
+  ov.innerHTML='<div style="font-weight:700;font-size:.95rem;margin-bottom:.5rem">🧵 Salvando clientes Elo7</div><div id="_e7prog">Iniciando...</div><div id="_e7bar" style="height:4px;background:#e0d9d3;border-radius:2px;margin-top:.75rem"><div id="_e7fill" style="height:4px;background:#E8440A;border-radius:2px;width:0;transition:width .3s"></div></div>';
   document.body.appendChild(ov);
   const prog=document.getElementById('_e7prog');
   const fill=document.getElementById('_e7fill');
@@ -393,7 +392,7 @@ const bookmarkletCode = `
   // Copy JSON to clipboard
   try{await navigator.clipboard.writeText(JSON.stringify(allClients));}catch(e){}
 
-  prog.innerHTML='<span style="color:#4CAF7D">✓ Concluído!</span> '+allClients.length+' clientes<br><small style="color:#8a7f74">CSV baixado • JSON copiado</small>';
+  prog.innerHTML='<span style="color:#2E8B57">✓ Concluído!</span> '+allClients.length+' clientes<br><small style="color:#8a7f74">CSV baixado • JSON copiado</small>';
   fill.style.width='100%';
   setTimeout(()=>ov.remove(),6000);
 })();
