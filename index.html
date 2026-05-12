@@ -218,7 +218,7 @@
     <div class="passos">
       <div class="passo"><div class="passo-n">2</div><p>Entre no Elo7 com a conta da sua esposa e acesse <code>Clientes → Procurar</code> (<code>/manage/client/list</code>)</p></div>
       <div class="passo"><div class="passo-n">3</div><p>Clique no favorito <strong>"Salvar Clientes Elo7"</strong> que você acabou de adicionar</p></div>
-      <div class="passo"><div class="passo-n">4</div><p>Uma janelinha vai aparecer mostrando o progresso. Ele percorre <strong>todas as 15 páginas</strong> automaticamente e decodifica os e-mails</p></div>
+      <div class="passo"><div class="passo-n">4</div><p>Uma janelinha vai aparecer mostrando o progresso. Ele detecta e percorre <strong>todas as páginas</strong> automaticamente e decodifica os e-mails</p></div>
       <div class="passo"><div class="passo-n">5</div><p>Ao terminar, <strong>o CSV é baixado automaticamente</strong>. Abra no Excel ou Google Sheets — pronto!</p></div>
     </div>
   </div>
@@ -277,16 +277,10 @@ function updateHero(n) {
   document.title = 'Elo7 Extrator — Salve seus ' + n.toLocaleString('pt-BR') + ' clientes';
 }
 
-// Verifica se já tem valor salvo (ex: reload da página)
-const saved = parseInt(localStorage.getItem('elo7_total_clients'));
-if (saved) updateHero(saved);
-
-// Ouve mudanças em tempo real (bookmarklet rodando em outra aba)
-window.addEventListener('storage', e => {
-  if (e.key === 'elo7_total_clients' && e.newValue) {
-    updateHero(parseInt(e.newValue));
-  }
-});
+// Lê ?total=N da URL (passado pelo bookmarklet ao abrir esta página)
+const urlParams = new URLSearchParams(window.location.search);
+const totalFromUrl = parseInt(urlParams.get('total'));
+if (totalFromUrl) updateHero(totalFromUrl);
 
 // ─── BOOKMARKLET CODE ─────────────────────────────────
 // Este é o código que roda dentro do Elo7 quando a vendedora clica no favorito
@@ -341,9 +335,10 @@ const bookmarkletCode = `
   }
 
   const totalClients = getTotalClients(document);
-  // Compartilha com a página extratora (aberta em outra aba) via localStorage
+  // Abre o extrator com ?total=N — URL fixa do GitHub Pages
+  const extractorUrl = 'https://mptagliari.github.io/e7ex/?total=';
   if(totalClients){
-    try{ localStorage.setItem('elo7_total_clients', totalClients); }catch(e){}
+    try{ window.open(extractorUrl+totalClients,'_blank'); }catch(e){}
   }
 
   // UI overlay
