@@ -82,7 +82,7 @@
     padding: .75rem 1.5rem;
     border-radius: 10px;
     text-decoration: none;
-    cursor: grab;
+    cursor: pointer;
     transition: background .15s, transform .1s;
     border: 2px solid rgba(255,255,255,.15);
     user-select: none;
@@ -258,20 +258,24 @@
     </p>
 
     <div class="instrucoes-bm">
-      <p class="inst-titulo">📌 Como instalar em 2 passos:</p>
+      <p class="inst-titulo">📌 Como instalar em 3 passos:</p>
       <div class="inst-passo">
         <span class="inst-num">1</span>
-        <span>Mostre a barra de favoritos do Chrome: pressione <kbd>⌘ Cmd</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> no Mac, ou <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> no Windows. Uma barra vai aparecer no topo do navegador.</span>
+        <span>Clique no botão abaixo para <strong>copiar o código</strong>.</span>
       </div>
       <div class="inst-passo">
         <span class="inst-num">2</span>
-        <span>Arraste o botão laranja abaixo até essa barra. Ele vai ficar salvo lá como um favorito normal.</span>
+        <span>Abra os favoritos do Chrome: <kbd>⌘ Cmd</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> no Mac ou <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> no Windows. Clique com o <strong>botão direito na barra</strong> → <strong>"Adicionar página"</strong>.</span>
+      </div>
+      <div class="inst-passo">
+        <span class="inst-num">3</span>
+        <span>No campo <strong>Nome</strong> escreva <em>Salvar Clientes Elo7</em>. No campo <strong>URL</strong> cole o código copiado (<kbd>⌘ V</kbd> ou <kbd>Ctrl V</kbd>). Clique em Salvar.</span>
       </div>
     </div>
 
     <div class="bm-wrap">
-      <span class="bm-label">⬇ Arraste este botão para a barra de favoritos</span>
-      <a class="bm-btn" id="bm-link" href="#">🧵 Salvar Clientes Elo7</a>
+      <button class="bm-btn" id="bm-copy" onclick="copyBookmarklet()">🧵 Copiar código do favorito</button>
+      <p id="bm-copied" style="display:none;margin-top:.75rem;color:var(--verde);font-size:.85rem;font-weight:600">✓ Copiado! Agora siga o passo 2.</p>
     </div>
 
     <div class="passos">
@@ -326,6 +330,20 @@
 </div><!-- /content -->
 
 <script>
+// ─── COPIAR BOOKMARKLET ──────────────────────────────
+function copyBookmarklet() {
+  const code = window._bmHref;
+  navigator.clipboard.writeText(code).then(() => {
+    document.getElementById('bm-copied').style.display = 'block';
+    const btn = document.getElementById('bm-copy');
+    btn.textContent = '✓ Copiado!';
+    setTimeout(() => {
+      btn.textContent = '🧵 Copiar código do favorito';
+      document.getElementById('bm-copied').style.display = 'none';
+    }, 4000);
+  });
+}
+
 // ─── HERO DINÂMICO ───────────────────────────────────
 // Quando o vendedor roda o bookmarklet no Elo7, o script grava o total
 // no localStorage. Esta página ouve a mudança e atualiza o hero.
@@ -458,8 +476,8 @@ const bookmarkletCode = `
 })();
 `.trim();
 
-// Set bookmarklet href
-document.getElementById('bm-link').href = 'javascript:' + encodeURIComponent(bookmarkletCode);
+// Guarda o href do bookmarklet numa variável global
+window._bmHref = 'javascript:' + encodeURIComponent(bookmarkletCode);
 
 // ─── PROCESS JSON PASTED ──────────────────────────────
 let allData = [];
