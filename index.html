@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elo7 Extrator — Salve seus clientes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+  :root {
+    --laranja: #FF5722;
+    --laranja-c: #FF7043;
+    --fundo: #0F0D0B;
+    --sup: #1A1713;
+    --sup2: #231F1A;
+    --borda: #2E2925;
+    --texto: #F0EBE3;
+    --suave: #8A7F74;
+    --verde: #4CAF7D;
+    --amarelo: #FFB300;
+    --azul: #42A5F5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--fundo); color: var(--texto); min-height: 100vh; }
+
+  header {
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid var(--borda);
+    display: flex; align-items: center; gap: 0.75rem;
+    position: sticky; top: 0;
+    background: rgba(15,13,11,0.94);
+    backdrop-filter: blur(12px); z-index: 100;
+  }
+  .logo { width:32px; height:32px; background: var(--laranja); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
+  header h1 { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; }
+  .tag { font-size:.65rem; font-weight:700; background:var(--laranja); color:#fff; padding:2px 7px; border-radius:20px; text-transform:uppercase; letter-spacing:.06em; }
+
+  .hero { max-width:640px; margin:0 auto; padding:3.5rem 2rem 2.5rem; text-align:center; }
+  .alerta { display:inline-flex; align-items:center; gap:.4rem; background:rgba(229,57,53,.1); border:1px solid rgba(229,57,53,.3); color:#EF9A9A; font-size:.78rem; padding:.35rem .9rem; border-radius:20px; margin-bottom:1.75rem; }
+  .hero h2 { font-family:'Syne',sans-serif; font-size:clamp(1.8rem,4.5vw,2.8rem); font-weight:800; line-height:1.1; margin-bottom:.9rem; }
+  .hero h2 em { font-style:normal; color:var(--laranja); }
+  .hero p { color:var(--suave); font-size:.95rem; line-height:1.7; }
+
+  .content { max-width:720px; margin:0 auto; padding:0 2rem 4rem; }
+
+  /* ── MÉTODO BOOKMARKLET ── */
+  .metodo {
+    background: var(--sup);
+    border: 1px solid var(--borda);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .metodo-header { display:flex; align-items:center; gap:.75rem; margin-bottom:1.25rem; }
+  .metodo-num { width:32px; height:32px; min-width:32px; border-radius:50%; background:var(--laranja); color:#fff; font-family:'Syne',sans-serif; font-weight:800; font-size:.85rem; display:flex; align-items:center; justify-content:center; }
+  .metodo-header h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; }
+  .metodo p { font-size:.875rem; color:var(--suave); line-height:1.7; margin-bottom:1rem; }
+  .metodo p:last-child { margin-bottom:0; }
+  .metodo strong { color:var(--texto); }
+
+  /* bookmarklet drag zone */
+  .bm-wrap {
+    background: var(--sup2);
+    border: 2px dashed var(--borda);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    margin: 1rem 0;
+    transition: border-color .2s;
+  }
+  .bm-wrap:hover { border-color: var(--laranja); }
+  .bm-label { font-size:.72rem; color:var(--suave); text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:.75rem; display:block; }
+
+  .bm-btn {
+    display: inline-block;
+    background: var(--laranja);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .95rem;
+    padding: .75rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    cursor: grab;
+    transition: background .15s, transform .1s;
+    border: 2px solid rgba(255,255,255,.15);
+    user-select: none;
+  }
+  .bm-btn:hover { background: var(--laranja-c); transform: scale(1.03); }
+  .bm-btn:active { transform: scale(.98); }
+
+  .bm-alt {
+    margin-top: .85rem;
+    font-size: .78rem;
+    color: var(--suave);
+  }
+
+  /* código alternativo */
+  .code-block {
+    background: #0a0908;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: monospace;
+    font-size: .72rem;
+    color: #a8c4a0;
+    word-break: break-all;
+    line-height: 1.5;
+    max-height: 80px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: max-height .3s;
+  }
+  .code-block.expanded { max-height: 400px; }
+  .code-block::after {
+    content: 'clique para expandir';
+    position: absolute; bottom:0; left:0; right:0;
+    background: linear-gradient(transparent, #0a0908 70%);
+    text-align:center; padding:.5rem;
+    font-size:.7rem; color:var(--suave); font-family:'DM Sans',sans-serif;
+  }
+  .code-block.expanded::after { display:none; }
+
+  /* passos */
+  .passos { display:flex; flex-direction:column; gap:.75rem; margin: 1rem 0 0; }
+  .passo { display:flex; gap:1rem; align-items:flex-start; }
+  .passo-n { min-width:24px; height:24px; background:var(--sup2); border:1px solid var(--borda); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:700; color:var(--suave); font-family:'Syne',sans-serif; margin-top:1px; }
+  .passo p { font-size:.85rem; color:var(--suave); line-height:1.6; }
+  .passo p strong { color:var(--texto); }
+  .passo p code { background:var(--sup2); border:1px solid var(--borda); padding:1px 5px; border-radius:4px; font-size:.78rem; color:var(--laranja-c); font-family:monospace; }
+
+  /* resultado */
+  #resultado { display:none; margin-top:2rem; }
+  #resultado.vis { display:block; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.75rem; margin-bottom:1.5rem; }
+  .stat { background:var(--sup); border:1px solid var(--borda); border-radius:10px; padding:1rem; text-align:center; }
+  .stat .n { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--laranja); display:block; line-height:1; }
+  .stat .l { font-size:.7rem; color:var(--suave); text-transform:uppercase; letter-spacing:.05em; font-weight:600; }
+
+  .toolbar { display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:1rem; }
+  .toolbar input { flex:1; min-width:180px; background:var(--sup); border:1px solid var(--borda); border-radius:7px; padding:.55rem .9rem; color:var(--texto); font-family:'DM Sans',sans-serif; font-size:.85rem; outline:none; }
+  .toolbar input:focus { border-color:var(--laranja); }
+  .toolbar input::placeholder { color:var(--suave); }
+  .btn { display:inline-flex; align-items:center; gap:.35rem; padding:.55rem 1.1rem; border-radius:7px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:.83rem; font-weight:500; transition:all .15s; white-space:nowrap; }
+  .btn-g { background:rgba(76,175,125,.15); color:var(--verde); border:1px solid rgba(76,175,125,.3); }
+  .btn-g:hover { background:rgba(76,175,125,.25); }
+  .btn-s { background:var(--sup); color:var(--texto); border:1px solid var(--borda); }
+  .btn-s:hover { border-color:var(--laranja); color:var(--laranja); }
+
+  .tablewrap { background:var(--sup); border:1px solid var(--borda); border-radius:10px; overflow:hidden; overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:.83rem; }
+  thead th { background:var(--sup2); padding:.65rem .9rem; text-align:left; font-family:'Syne',sans-serif; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--suave); border-bottom:1px solid var(--borda); }
+  tbody tr { border-bottom:1px solid var(--borda); transition:background .1s; }
+  tbody tr:last-child { border-bottom:none; }
+  tbody tr:hover { background:var(--sup2); }
+  tbody td { padding:.65rem .9rem; vertical-align:middle; }
+  .td-email { color:var(--laranja-c); font-family:monospace; font-size:.78rem; }
+  .td-sem { color:var(--suave); font-size:.78rem; font-style:italic; }
+  .td-green { color:var(--verde); }
+
+  .nota { margin-top:1.25rem; background:rgba(255,179,0,.06); border:1px solid rgba(255,179,0,.2); border-radius:8px; padding:.9rem 1.1rem; font-size:.78rem; color:#FFD54F; line-height:1.6; }
+
+  /* PASTE ZONE */
+  .paste-area {
+    background: var(--sup2);
+    border: 2px dashed var(--borda);
+    border-radius:12px;
+    padding: 1.25rem;
+    margin-top: 1rem;
+  }
+  .paste-area label { font-size:.8rem; color:var(--suave); display:block; margin-bottom:.5rem; }
+  .paste-area textarea {
+    width:100%; height:120px; background:var(--fundo); border:1px solid var(--borda);
+    border-radius:8px; padding:.75rem; color:var(--texto); font-family:monospace; font-size:.75rem;
+    resize:vertical; outline:none; line-height:1.5;
+  }
+  .paste-area textarea:focus { border-color:var(--laranja); }
+  .paste-area .btn-proc { margin-top:.6rem; background:var(--laranja); color:#fff; padding:.6rem 1.25rem; border-radius:7px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:.85rem; font-weight:600; }
+  .paste-area .btn-proc:hover { background:var(--laranja-c); }
+
+  @media(max-width:600px){
+    .hero,.content{ padding-left:1.25rem; padding-right:1.25rem; }
+    .hide-mob { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🧵</div>
+  <h1>Elo7 Extrator <span class="tag">urgente</span></h1>
+</header>
+
+<div class="hero">
+  <div class="alerta">🚨 Elo7 encerrou — salve seus clientes agora</div>
+  <h2 id="hero-title">Seus clientes<br><em>em 1 clique</em></h2>
+  <p id="hero-sub">Use o botão abaixo como bookmarklet no Chrome/Safari. Ele percorre todas as páginas da sua lista de clientes no Elo7 e gera um CSV completo — sem instalar nada.</p>
+</div>
+
+<div class="content">
+
+  <!-- MÉTODO: BOOKMARKLET -->
+  <div class="metodo">
+    <div class="metodo-header">
+      <div class="metodo-num">1</div>
+      <h3>Arraste o botão para a barra de favoritos</h3>
+    </div>
+    <p>Mostre a barra de favoritos do Chrome: <strong>Ctrl+Shift+B</strong> (Mac: <strong>⌘+Shift+B</strong>). Depois arraste o botão laranja abaixo para ela:</p>
+
+    <div class="bm-wrap">
+      <span class="bm-label">⬇ Arraste para a barra de favoritos</span>
+      <a class="bm-btn" id="bm-link" href="#">🧵 Salvar Clientes Elo7</a>
+      <p class="bm-alt">Se não funcionar arrastar, clique no botão com o botão direito → "Adicionar aos favoritos"</p>
+    </div>
+
+    <div class="passos">
+      <div class="passo"><div class="passo-n">2</div><p>Entre no Elo7 com a conta da sua esposa e acesse <code>Clientes → Procurar</code> (<code>/manage/client/list</code>)</p></div>
+      <div class="passo"><div class="passo-n">3</div><p>Clique no favorito <strong>"Salvar Clientes Elo7"</strong> que você acabou de adicionar</p></div>
+      <div class="passo"><div class="passo-n">4</div><p>Uma janelinha vai aparecer mostrando o progresso. Ele percorre <strong>todas as 15 páginas</strong> automaticamente e decodifica os e-mails</p></div>
+      <div class="passo"><div class="passo-n">5</div><p>Ao terminar, <strong>o CSV é baixado automaticamente</strong>. Abra no Excel ou Google Sheets — pronto!</p></div>
+    </div>
+  </div>
+
+  <!-- ALTERNATIVA: COLAR JSON AQUI -->
+  <div class="metodo">
+    <div class="metodo-header">
+      <div class="metodo-num">2</div>
+      <h3>Alternativa: cole o resultado aqui para visualizar</h3>
+    </div>
+    <p>Se quiser ver a tabela antes de exportar, o bookmarklet também copia o JSON para a área de transferência. Cole aqui:</p>
+    <div class="paste-area">
+      <label>Cole o JSON gerado pelo bookmarklet:</label>
+      <textarea id="jsonInput" placeholder='[{"nome":"ABIGAIL ...","email":"...","celular":"...","cidade":"..."}]'></textarea>
+      <button class="btn-proc" onclick="processJSON()">Processar e exibir tabela</button>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="resultado">
+    <div class="stats">
+      <div class="stat"><span class="n" id="st-c">0</span><span class="l">Clientes</span></div>
+      <div class="stat"><span class="n" id="st-e">0</span><span class="l">Com e-mail</span></div>
+      <div class="stat"><span class="n" id="st-f">0</span><span class="l">Com celular</span></div>
+      <div class="stat"><span class="n" id="st-ci">0</span><span class="l">Cidades</span></div>
+    </div>
+    <div class="toolbar">
+      <input type="search" id="busca" placeholder="🔍 Buscar por nome, e-mail ou cidade…">
+      <button class="btn btn-g" onclick="exportCSV()">⬇ CSV</button>
+      <button class="btn btn-s" onclick="exportJSON()">⬇ JSON</button>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>Nome</th>
+          <th>E-mail</th>
+          <th class="hide-mob">Celular</th>
+          <th class="hide-mob">Cidade</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="nota">⚠️ <strong>LGPD:</strong> Use estes dados apenas para contato com clientes existentes. Armazene com segurança.</div>
+  </div>
+
+</div><!-- /content -->
+
+<script>
+// ─── HERO DINÂMICO ───────────────────────────────────
+// Quando o vendedor roda o bookmarklet no Elo7, o script grava o total
+// no localStorage. Esta página ouve a mudança e atualiza o hero.
+function updateHero(n) {
+  if (!n) return;
+  document.getElementById('hero-title').innerHTML =
+    n.toLocaleString('pt-BR') + ' clientes<br><em>em 1 clique</em>';
+  document.title = 'Elo7 Extrator — Salve seus ' + n.toLocaleString('pt-BR') + ' clientes';
+}
+
+// Verifica se já tem valor salvo (ex: reload da página)
+const saved = parseInt(localStorage.getItem('elo7_total_clients'));
+if (saved) updateHero(saved);
+
+// Ouve mudanças em tempo real (bookmarklet rodando em outra aba)
+window.addEventListener('storage', e => {
+  if (e.key === 'elo7_total_clients' && e.newValue) {
+    updateHero(parseInt(e.newValue));
+  }
+});
+
+// ─── BOOKMARKLET CODE ─────────────────────────────────
+// Este é o código que roda dentro do Elo7 quando a vendedora clica no favorito
+const bookmarkletCode = `
+(async function(){
+  // Decode Cloudflare email obfuscation
+  function decodeEmail(enc){
+    let email='', r=parseInt(enc.substr(0,2),16);
+    for(let n=2;n<enc.length;n+=2)
+      email+=String.fromCharCode(parseInt(enc.substr(n,2),16)^r);
+    return email;
+  }
+
+  function parseClients(doc){
+    const rows=doc.querySelectorAll('table.striped-table tbody tr');
+    const result=[];
+    rows.forEach(tr=>{
+      const tds=tr.querySelectorAll('td');
+      if(tds.length<5) return;
+      const nome=tds[0].querySelector('a')?.textContent?.trim()||'';
+      const fone=tds[1].textContent.trim();
+      const cel=tds[2].textContent.trim();
+      const emailEl=tds[3].querySelector('[data-cfemail]');
+      const email=emailEl?decodeEmail(emailEl.getAttribute('data-cfemail')):(tds[3].textContent.trim());
+      const cidade=tds[4].textContent.trim();
+      result.push({nome,telefone:fone,celular:cel,email,cidade});
+    });
+    return result;
+  }
+
+  // Detect total pages
+  function getTotalPages(doc){
+    const links=doc.querySelectorAll('.pagination-list .page a');
+    let max=1;
+    links.forEach(a=>{
+      const m=a.href.match(/pageNum=(\\d+)/);
+      if(m) max=Math.max(max,parseInt(m[1]));
+    });
+    // last page link
+    const last=doc.querySelector('.pagination-list li:last-child a');
+    if(last){const m=last.href.match(/pageNum=(\\d+)/);if(m)max=Math.max(max,parseInt(m[1]));}
+    return max;
+  }
+
+  // Lê total de clientes da página
+  function getTotalClients(doc){
+    const el=doc.querySelector('.list-report');
+    if(!el) return null;
+    const m=el.textContent.match(/de\\s+([\\d\\.]+)\\s+clientes/i);
+    if(m) return parseInt(m[1].replace(/\\./g,''));
+    return null;
+  }
+
+  const totalClients = getTotalClients(document);
+  // Compartilha com a página extratora (aberta em outra aba) via localStorage
+  if(totalClients){
+    try{ localStorage.setItem('elo7_total_clients', totalClients); }catch(e){}
+  }
+
+  // UI overlay
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;top:20px;right:20px;z-index:99999;background:#1a1713;border:1px solid #FF5722;border-radius:12px;padding:1.25rem 1.5rem;font-family:sans-serif;color:#f0ebe3;min-width:260px;box-shadow:0 8px 32px rgba(0,0,0,.5)';
+  ov.innerHTML='<div style="font-weight:700;font-size:.95rem;margin-bottom:.5rem">🧵 Salvando clientes Elo7</div><div id="_e7prog">Iniciando...</div><div id="_e7bar" style="height:4px;background:#2e2925;border-radius:2px;margin-top:.75rem"><div id="_e7fill" style="height:4px;background:#FF5722;border-radius:2px;width:0;transition:width .3s"></div></div>';
+  document.body.appendChild(ov);
+  const prog=document.getElementById('_e7prog');
+  const fill=document.getElementById('_e7fill');
+
+  const allClients=[];
+
+  // Page 1 is current
+  const firstClients=parseClients(document);
+  allClients.push(...firstClients);
+  const totalPages=getTotalPages(document);
+  prog.textContent='Página 1 de '+totalPages+' ('+allClients.length+' clientes)';
+  fill.style.width=(100/totalPages)+'%';
+
+  // Fetch remaining pages
+  for(let p=2;p<=totalPages;p++){
+    try{
+      prog.textContent='Buscando página '+p+' de '+totalPages+'...';
+      const r=await fetch('/manage/client/list?pageNum='+p,{credentials:'include'});
+      const html=await r.text();
+      const parser=new DOMParser();
+      const doc=parser.parseFromString(html,'text/html');
+      const clients=parseClients(doc);
+      allClients.push(...clients);
+      fill.style.width=(p/totalPages*100)+'%';
+      prog.textContent='Página '+p+'/'+totalPages+' — '+allClients.length+' clientes coletados';
+    }catch(e){
+      prog.textContent='Erro na página '+p+': '+e.message;
+    }
+    await new Promise(res=>setTimeout(res,400));
+  }
+
+  // Generate CSV
+  const bom='\\uFEFF';
+  const header='Nome;Telefone;Celular;E-mail;Cidade\\n';
+  const rows=allClients.map(c=>
+    [c.nome,c.telefone,c.celular,c.email,c.cidade]
+    .map(v=>'"'+(v||'').replace(/"/g,'""')+'"').join(';')
+  ).join('\\n');
+  const csv=bom+header+rows;
+
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='clientes-elo7-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+
+  // Copy JSON to clipboard
+  try{await navigator.clipboard.writeText(JSON.stringify(allClients));}catch(e){}
+
+  prog.innerHTML='<span style="color:#4CAF7D">✓ Concluído!</span> '+allClients.length+' clientes<br><small style="color:#8a7f74">CSV baixado • JSON copiado</small>';
+  fill.style.width='100%';
+  setTimeout(()=>ov.remove(),6000);
+})();
+`.trim();
+
+// Set bookmarklet href
+document.getElementById('bm-link').href = 'javascript:' + encodeURIComponent(bookmarkletCode);
+
+// ─── PROCESS JSON PASTED ──────────────────────────────
+let allData = [];
+
+function processJSON() {
+  const raw = document.getElementById('jsonInput').value.trim();
+  if (!raw) return;
+  try {
+    allData = JSON.parse(raw);
+    renderStats(allData);
+    renderTable(allData);
+    document.getElementById('resultado').classList.add('vis');
+    document.getElementById('resultado').scrollIntoView({behavior:'smooth'});
+  } catch(e) {
+    alert('JSON inválido. Certifique-se de ter colado o conteúdo gerado pelo bookmarklet.');
+  }
+}
+
+function renderStats(data) {
+  document.getElementById('st-c').textContent = data.length;
+  document.getElementById('st-e').textContent = data.filter(c => c.email && c.email.includes('@')).length;
+  document.getElementById('st-f').textContent = data.filter(c => c.celular && c.celular.length > 5).length;
+  const cidades = new Set(data.map(c => c.cidade).filter(Boolean));
+  document.getElementById('st-ci').textContent = cidades.size;
+}
+
+function renderTable(data) {
+  const q = (document.getElementById('busca')?.value||'').toLowerCase();
+  const filtered = q ? data.filter(c =>
+    (c.nome||'').toLowerCase().includes(q) ||
+    (c.email||'').toLowerCase().includes(q) ||
+    (c.cidade||'').toLowerCase().includes(q)
+  ) : data;
+
+  const tbody = document.getElementById('tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--suave)">Nenhum resultado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(c => `
+    <tr>
+      <td><strong>${esc(c.nome||'—')}</strong></td>
+      <td>${c.email&&c.email.includes('@') ? `<span class="td-email">${esc(c.email)}</span>` : '<span class="td-sem">sem e-mail</span>'}</td>
+      <td class="hide-mob">${c.celular ? `<span class="td-green">${esc(c.celular)}</span>` : '<span class="td-sem">—</span>'}</td>
+      <td class="hide-mob">${esc(c.cidade||'—')}</td>
+    </tr>
+  `).join('');
+}
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'busca' && allData.length) renderTable(allData);
+});
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function exportCSV() {
+  const rows = [['Nome','Telefone','Celular','E-mail','Cidade']];
+  allData.forEach(c => rows.push([c.nome,c.telefone,c.celular,c.email,c.cidade]));
+  const csv = '\uFEFF' + rows.map(r => r.map(v => `"${(v||'').replace(/"/g,'""')}"`).join(';')).join('\n');
+  dl('clientes-elo7.csv','text/csv;charset=utf-8',csv);
+}
+function exportJSON() {
+  dl('clientes-elo7.json','application/json',JSON.stringify(allData,null,2));
+}
+function dl(name,mime,content){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download=name; a.click();
+}
+</script>
+</body>
+</html>
